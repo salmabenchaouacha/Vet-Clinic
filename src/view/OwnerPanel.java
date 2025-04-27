@@ -1,7 +1,8 @@
 package view;
 
 import model.Owner;
-import rmi.VeterinaryService;
+import service.AnimalServiceClient;
+import service.OwnerServiceClient;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,12 +13,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class OwnerPanel extends JPanel {
-    private VeterinaryService service;
+    private OwnerServiceClient service;
+    private AnimalServiceClient animalService;
     private JTable ownerTable;
     private DefaultTableModel tableModel;
 
-    public OwnerPanel(VeterinaryService service) {
-        this.service = service;
+    public OwnerPanel() {
+        this.service = new OwnerServiceClient();
+        this.animalService = new AnimalServiceClient();
         setLayout(new BorderLayout());
         setBackground(new Color(245, 245, 220)); // Fond beige clair pour le panneau principal
 
@@ -287,7 +290,7 @@ public class OwnerPanel extends JPanel {
         List<model.Animal> animals;
         int animalCount = 0;
         try {
-            animals = service.getAllAnimals().stream()
+            animals = animalService.getAllAnimals().stream()
                     .filter(a -> a.getOwnerId() == owner.getId())
                     .collect(Collectors.toList());
             animalCount = animals.size();

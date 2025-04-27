@@ -2,19 +2,19 @@ package view;
 
 import model.ChatMessage;
 import model.Veterinarian;
-import rmi.VeterinaryService;
+import service.ChatMessageServiceClient;
+import service.VeterinarianServiceClient;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.swing.border.EmptyBorder;
 
 public class ChatFrame extends JFrame {
-    private VeterinaryService service;
+    private ChatMessageServiceClient chatService;
+    private VeterinarianServiceClient veterinarianService;
     private String currentUsername;
     private String selectedVetUsername;
     private JTextArea chatArea;
@@ -22,8 +22,9 @@ public class ChatFrame extends JFrame {
     private Timer refreshTimer;
     private JComboBox<String> veterinarianCombo;
 
-    public ChatFrame(VeterinaryService service, String currentUsername) {
-        this.service = service;
+    public ChatFrame(String currentUsername) {
+        this.veterinarianService = new VeterinarianServiceClient();
+        this.chatService = new ChatMessageServiceClient();
         this.currentUsername = currentUsername;
         
         setTitle("Chat Vétérinaire");
@@ -101,7 +102,7 @@ public class ChatFrame extends JFrame {
     
     private void loadVeterinarians() {
         try {
-            List<Veterinarian> vets = service.getAllVeterinarians();
+            List<Veterinarian> vets = veterinarianService.findAllVeterinarians();
             veterinarianCombo.removeAllItems();
             
             if (vets == null || vets.isEmpty()) {
@@ -126,7 +127,7 @@ public class ChatFrame extends JFrame {
                     JOptionPane.INFORMATION_MESSAGE);
             }
             
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             System.err.println("Erreur lors du chargement des vétérinaires : " + e.getMessage());
             JOptionPane.showMessageDialog(this,
                 "Erreur lors du chargement des vétérinaires : " + e.getMessage(),
@@ -139,10 +140,10 @@ public class ChatFrame extends JFrame {
         String message = messageField.getText().trim();
         if (!message.isEmpty() && selectedVetUsername != null) {
             try {
-                service.sendChatMessage(currentUsername, selectedVetUsername, message);
+                chatService.sendChatMessage(currentUsername, selectedVetUsername, message);
                 messageField.setText("");
                 refreshChat();
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Erreur lors de l'envoi du message : " + e.getMessage());
             }
         }
@@ -151,9 +152,9 @@ public class ChatFrame extends JFrame {
     private void refreshChat() {
         if (selectedVetUsername != null) {
             try {
-                List<ChatMessage> messages = service.getChatMessages(currentUsername, selectedVetUsername);
+                List<ChatMessage> messages = chatService.getMessagesBetweenUsers(currentUsername, selectedVetUsername);
                 updateChatArea(messages);
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 System.err.println("Erreur lors du rafraîchissement du chat : " + e.getMessage());
             }
         }

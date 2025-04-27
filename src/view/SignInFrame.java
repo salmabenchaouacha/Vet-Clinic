@@ -1,16 +1,17 @@
 package view;
 
-import rmi.VeterinaryService;
+import service.VeterinarianServiceClient;
+import service.VisitServiceClient;
 
 import javax.swing.*;
 import java.awt.*;
 import java.rmi.RemoteException;
 
 public class SignInFrame extends JFrame {
-    private VeterinaryService service;
+    private VeterinarianServiceClient service;
 
-    public SignInFrame(VeterinaryService service) {
-        this.service = service;
+    public SignInFrame() {
+        this.service = new VeterinarianServiceClient() ;
         setTitle("Connexion - Gestion Vétérinaire");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,21 +58,21 @@ public class SignInFrame extends JFrame {
             }
 
             try {
-                boolean authenticated = service.signIn(username, password);
+                boolean authenticated = service.authenticateVeterinarian(username, password);
                 if (authenticated) {
                     JOptionPane.showMessageDialog(this, "Connexion réussie !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                     dispose();
-                    new MainFrame(service, username).setVisible(true);
+                    new MainFrame( username).setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(this, "Nom d'utilisateur ou mot de passe incorrect", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
-            } catch (RemoteException ex) {
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Erreur lors de la connexion : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         // Action du bouton d'inscription
-        signUpButton.addActionListener(e -> new SignUpFrame(service).setVisible(true));
+        signUpButton.addActionListener(e -> new SignUpFrame().setVisible(true));
     }
 
     private void styleButton(JButton button) {

@@ -3,7 +3,9 @@ package view;
 import model.Animal;
 import model.Owner;
 import model.Visit;
-import rmi.VeterinaryService;
+import service.AnimalServiceClient;
+import service.OwnerServiceClient;
+import service.VisitServiceClient;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,12 +14,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class VisitPanel extends JPanel {
-    private VeterinaryService service;
+    private VisitServiceClient service;
+    private OwnerServiceClient ownerService;
+    private AnimalServiceClient animalService;
     private JTable visitTable;
     private DefaultTableModel tableModel;
 
-    public VisitPanel(VeterinaryService service) {
-        this.service = service;
+    public VisitPanel() {
+        this.service = new VisitServiceClient();
+        this.ownerService = new OwnerServiceClient();
+        this.animalService = new AnimalServiceClient();
         setLayout(new BorderLayout());
         setBackground(new Color(245, 245, 220)); // Fond beige clair
 
@@ -106,7 +112,7 @@ public class VisitPanel extends JPanel {
         JTextField notesField = new JTextField(visit != null ? visit.getNotes() : "");
 
         try {
-            List<Owner> owners = service.getAllOwners();
+            List<Owner> owners = ownerService.getAllOwners();
             for (Owner owner : owners) {
                 ownerCombo.addItem(owner.getId() + " - " + owner.getFullName());
             }
@@ -122,7 +128,7 @@ public class VisitPanel extends JPanel {
             if (selectedOwner != null) {
                 try {
                     int ownerId = Integer.parseInt(selectedOwner.split(" - ")[0]);
-                    List<Animal> animals = service.getAllAnimals().stream()
+                    List<Animal> animals = animalService.getAllAnimals().stream()
                             .filter(a -> a.getOwnerId() == ownerId)
                             .collect(Collectors.toList());
                     for (Animal animal : animals) {
@@ -137,12 +143,12 @@ public class VisitPanel extends JPanel {
         // Si modification, pré-sélectionner le propriétaire et l'animal
         if (visit != null) {
             try {
-                Animal selectedAnimal = service.getAllAnimals().stream()
+                Animal selectedAnimal = animalService.getAllAnimals().stream()
                         .filter(a -> a.getId() == visit.getAnimalId())
                         .findFirst()
                         .orElse(null);
                 if (selectedAnimal != null) {
-                    Owner selectedOwner = service.getAllOwners().stream()
+                    Owner selectedOwner = ownerService.getAllOwners().stream()
                             .filter(o -> o.getId() == selectedAnimal.getOwnerId())
                             .findFirst()
                             .orElse(null);
@@ -212,7 +218,7 @@ public class VisitPanel extends JPanel {
         tableModel.setRowCount(0);
         try {
             List<Visit> visits = service.getAllVisits();
-            List<Animal> animals = service.getAllAnimals();
+            List<Animal> animals = animalService.getAllAnimals();
             for (Visit visit : visits) {
                 String animalName = animals.stream()
                         .filter(a -> a.getId() == visit.getAnimalId())

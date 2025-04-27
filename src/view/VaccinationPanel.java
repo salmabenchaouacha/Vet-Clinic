@@ -3,22 +3,25 @@ package view;
 import model.Animal;
 import model.Owner;
 import model.Vaccination;
-import rmi.VeterinaryService;
+import service.AnimalServiceClient;
+import service.OwnerServiceClient;
+import service.VaccinationServiceClient;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class VaccinationPanel extends JPanel {
-    private VeterinaryService service;
+    private VaccinationServiceClient service;
+    private AnimalServiceClient animalService;
     private JTable vaccinationTable;
     private DefaultTableModel tableModel;
+    private OwnerServiceClient ownerService;
     // Liste prédéfinie des types de vaccins
     private static final String[] VACCINE_TYPES = {
             "Rage",
@@ -30,8 +33,10 @@ public class VaccinationPanel extends JPanel {
             "Typhus"
     };
 
-    public VaccinationPanel(VeterinaryService service) {
-        this.service = service;
+    public VaccinationPanel() {
+        this.service = new VaccinationServiceClient();
+        this.ownerService = new OwnerServiceClient();
+        this.animalService = new AnimalServiceClient();
         setLayout(new BorderLayout());
         setBackground(new Color(245, 245, 220)); // Fond beige clair
 
@@ -134,7 +139,7 @@ public class VaccinationPanel extends JPanel {
         }
 
         try {
-            List<Owner> owners = service.getAllOwners();
+            List<Owner> owners = ownerService.getAllOwners();
             for (Owner owner : owners) {
                 ownerCombo.addItem(owner.getId() + " - " + owner.getFullName());
             }
@@ -150,7 +155,7 @@ public class VaccinationPanel extends JPanel {
             if (selectedOwner != null) {
                 try {
                     int ownerId = Integer.parseInt(selectedOwner.split(" - ")[0]);
-                    List<Animal> animals = service.getAllAnimals().stream()
+                    List<Animal> animals = animalService.getAllAnimals().stream()
                             .filter(a -> a.getOwnerId() == ownerId)
                             .collect(Collectors.toList());
                     for (Animal animal : animals) {
@@ -165,12 +170,12 @@ public class VaccinationPanel extends JPanel {
         // Si modification, pré-sélectionner le propriétaire et l'animal
         if (vaccination != null) {
             try {
-                Animal selectedAnimal = service.getAllAnimals().stream()
+                Animal selectedAnimal = animalService.getAllAnimals().stream()
                         .filter(a -> a.getId() == vaccination.getAnimalId())
                         .findFirst()
                         .orElse(null);
                 if (selectedAnimal != null) {
-                    Owner selectedOwner = service.getAllOwners().stream()
+                    Owner selectedOwner = ownerService.getAllOwners().stream()
                             .filter(o -> o.getId() == selectedAnimal.getOwnerId())
                             .findFirst()
                             .orElse(null);
@@ -241,7 +246,7 @@ public class VaccinationPanel extends JPanel {
         tableModel.setRowCount(0);
         try {
             List<Vaccination> vaccinations = service.getAllVaccinations();
-            List<Animal> animals = service.getAllAnimals();
+            List<Animal> animals = animalService.getAllAnimals();
             for (Vaccination vaccination : vaccinations) {
                 String animalName = animals.stream()
                         .filter(a -> a.getId() == vaccination.getAnimalId())

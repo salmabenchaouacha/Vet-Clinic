@@ -2,7 +2,8 @@ package view;
 
 import model.Animal;
 import model.Owner;
-import rmi.VeterinaryService;
+import service.AnimalServiceClient;
+import service.OwnerServiceClient;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -15,12 +16,14 @@ import java.io.File;
 import java.util.List;
 
 public class AnimalPanel extends JPanel {
-    private VeterinaryService service;
+    private OwnerServiceClient ownerService;
     private JTable animalTable;
     private DefaultTableModel tableModel;
+    private AnimalServiceClient animalServiceClient;
 
-    public AnimalPanel(VeterinaryService service) {
-        this.service = service;
+    public AnimalPanel() {
+        this.ownerService = new OwnerServiceClient();
+        this.animalServiceClient = new AnimalServiceClient();
         setLayout(new BorderLayout());
         setBackground(new Color(224, 242, 254)); // Bleu pâle pastel (#E0F2FE)
 
@@ -185,7 +188,7 @@ public class AnimalPanel extends JPanel {
                 int confirm = JOptionPane.showConfirmDialog(this, "Supprimer cet animal ?", "Confirmation", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     try {
-                        service.deleteAnimal(id);
+                        animalServiceClient.deleteAnimal(id);
                         refreshTable();
                         JOptionPane.showMessageDialog(this, "Animal supprimé avec succès", "Succès", JOptionPane.INFORMATION_MESSAGE);
                     } catch (Exception ex) {
@@ -234,7 +237,7 @@ public class AnimalPanel extends JPanel {
 
         JComboBox<String> ownerCombo = new JComboBox<>();
         try {
-            List<Owner> owners = service.getAllOwners();
+            List<Owner> owners = ownerService.getAllOwners();
             for (Owner owner : owners) {
                 ownerCombo.addItem(owner.getId() + " - " + owner.getFullName());
             }
@@ -293,10 +296,10 @@ public class AnimalPanel extends JPanel {
                         photoField.getText().trim() // Enregistrer le chemin de la photo
                 );
                 if (animal == null) {
-                    service.addAnimal(newAnimal);
+                    animalServiceClient.addAnimal(newAnimal);
                     JOptionPane.showMessageDialog(dialog, "Animal ajouté avec succès", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    service.updateAnimal(newAnimal);
+                    animalServiceClient.updateAnimal(newAnimal);
                     JOptionPane.showMessageDialog(dialog, "Animal modifié avec succès", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 }
                 refreshTable();
@@ -312,8 +315,8 @@ public class AnimalPanel extends JPanel {
     private void refreshTable() {
         tableModel.setRowCount(0);
         try {
-            List<Animal> animals = service.getAllAnimals();
-            List<Owner> owners = service.getAllOwners();
+            List<Animal> animals = animalServiceClient.getAllAnimals();
+            List<Owner> owners = ownerService.getAllOwners();
             for (Animal animal : animals) {
                 String ownerName = owners.stream()
                         .filter(o -> o.getId() == animal.getOwnerId())

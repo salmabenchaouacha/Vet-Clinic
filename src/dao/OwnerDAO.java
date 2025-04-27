@@ -16,4 +16,5 @@ public interface OwnerDAO {
     public void deleteOwner(int id) throws Exception;
 
     public Owner getOwnerById(int id) throws Exception;
+    public List<Owner> searchOwnersByLastName(String lastName) throws Exception;
 }

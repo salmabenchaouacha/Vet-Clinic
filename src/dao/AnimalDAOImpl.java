@@ -80,49 +80,31 @@ public class AnimalDAOImpl implements AnimalDAO{
         }
     }
 
-    @Override
-    public List<Owner> searchOwnersByLastName(String lastName) throws Exception {
-        List<Owner> owners = new ArrayList<>();
-        String query = "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name, phone, email " +
-                "FROM owners WHERE last_name LIKE ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, "%" + lastName + "%");
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                Owner owner = new Owner(
-                        rs.getInt("id"),
-                        rs.getString("full_name"),
-                        rs.getString("phone"),
-                        rs.getString("email")
-                );
-                owners.add(owner);
-            }
-        } catch (SQLException e) {
-            throw new Exception("Erreur lors de la recherche des propriétaires : " + e.getMessage());
-        }
-        return owners;
-    }
 
     @Override
-    public List<Owner> getAllOwners() throws Exception {
-        List<Owner> owners = new ArrayList<>();
-        String query = "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name, phone, email FROM owners";
+    public List<Animal> getAllAnimals() throws RemoteException {
+        List<Animal> animals = new ArrayList<>();
+        String query = "SELECT * FROM animals";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                Owner owner = new Owner(
+                Animal animal = new Animal(
                         rs.getInt("id"),
-                        rs.getString("full_name"),
-                        rs.getString("phone"),
-                        rs.getString("email")
+                        rs.getString("name"),
+                        rs.getString("species"),
+                        rs.getString("breed"),
+                        rs.getString("age"),
+                        rs.getString("sex"),
+                        rs.getString("chip_number"),
+                        rs.getInt("owner_id"),
+                        rs.getString("photoPath")
                 );
-                owners.add(owner);
+                animals.add(animal);
             }
         } catch (SQLException e) {
-            throw new RemoteException("Erreur lors de la récupération des propriétaires : " + e.getMessage());
+            throw new RemoteException("Erreur lors de la récupération des animaux : " + e.getMessage());
         }
-        return owners;
+        return animals;
     }
 }

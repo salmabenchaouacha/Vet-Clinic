@@ -1,7 +1,7 @@
 package view;
 
 import model.Veterinarian;
-import rmi.VeterinaryService;
+import service.VeterinarianServiceClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,15 +12,15 @@ import java.rmi.RemoteException;
 import javax.imageio.ImageIO;
 
 public class ProfileFrame extends JFrame {
-    private VeterinaryService service;
+    private VeterinarianServiceClient service;
     private Veterinarian veterinarian;
     private JTextField fullNameField;
     private JTextField emailField;
     private JTextField phoneField;
     private JTextField photoPathField;
 
-    public ProfileFrame(VeterinaryService service, Veterinarian veterinarian, MainFrame mainFrame) {
-        this.service = service;
+    public ProfileFrame(Veterinarian veterinarian, MainFrame mainFrame) {
+        this.service = new VeterinarianServiceClient();
         this.veterinarian = veterinarian;
         setTitle("Profil du Vétérinaire");
         setSize(400, 500);
@@ -117,8 +117,8 @@ public class ProfileFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Profil mis à jour avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
                 mainFrame.dispose();
-                new MainFrame(service, veterinarian.getUsername()).setVisible(true);
-            } catch (RemoteException ex) {
+                new MainFrame(veterinarian.getUsername()).setVisible(true);
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Erreur lors de la mise à jour du profil : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -127,7 +127,7 @@ public class ProfileFrame extends JFrame {
         logoutButton.addActionListener(e -> {
             dispose();
             mainFrame.dispose();
-            new SignInFrame(service).setVisible(true);
+            new SignInFrame().setVisible(true);
         });
     }
 

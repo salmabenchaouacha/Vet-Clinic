@@ -1,7 +1,7 @@
 package view;
 
 import model.Veterinarian;
-import rmi.VeterinaryService;
+import service.VeterinarianServiceClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,11 +9,11 @@ import java.io.File;
 import java.rmi.RemoteException;
 
 public class SignUpFrame extends JFrame {
-    private VeterinaryService service;
+    private VeterinarianServiceClient service;
     private JTextField photoPathField;
 
-    public SignUpFrame(VeterinaryService service) {
-        this.service = service;
+    public SignUpFrame() {
+        this.service = new VeterinarianServiceClient();
         setTitle("Inscription - Gestion Vétérinaire");
         setSize(400, 450); // Augmenter la taille pour le champ photo
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -92,10 +92,10 @@ public class SignUpFrame extends JFrame {
 
             Veterinarian vet = new Veterinarian(0, username, password, fullName, email, phone, photoPath.isEmpty() ? null : photoPath);
             try {
-                service.signUp(vet);
+                service.saveVeterinarian(vet);
                 JOptionPane.showMessageDialog(this, "Inscription réussie ! Vous pouvez maintenant vous connecter.", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
-            } catch (RemoteException ex) {
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Erreur lors de l'inscription : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });

@@ -1,7 +1,7 @@
 package view;
 
 import model.Veterinarian;
-import rmi.VeterinaryService;
+import service.VeterinarianServiceClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,11 +16,12 @@ import java.rmi.RemoteException;
 import javax.imageio.ImageIO;
 
 public class MainFrame extends JFrame {
-    private VeterinaryService service;
+    private VeterinarianServiceClient client;
+
     private String loggedInUsername;
 
-    public MainFrame(VeterinaryService service, String loggedInUsername) {
-        this.service = service;
+    public MainFrame(String loggedInUsername) {
+        this.client = new VeterinarianServiceClient();
         this.loggedInUsername = loggedInUsername;
         setTitle("Gestion Vétérinaire");
         setSize(800, 600);
@@ -32,8 +33,8 @@ public class MainFrame extends JFrame {
         // Récupérer les informations du vétérinaire connecté
         Veterinarian vet = null;
         try {
-            vet = service.getVeterinarianByUsername(loggedInUsername);
-        } catch (RemoteException e) {
+            vet = client.findVeterinarianByUsername(loggedInUsername);
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erreur lors de la récupération du profil : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -112,7 +113,7 @@ public class MainFrame extends JFrame {
             MouseAdapter openProfileListener = new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    new ProfileFrame(service, finalVet, MainFrame.this).setVisible(true);
+                    new ProfileFrame(finalVet, MainFrame.this).setVisible(true);
                 }
             };
             photoLabel.addMouseListener(openProfileListener);
@@ -149,7 +150,7 @@ public class MainFrame extends JFrame {
             chatButton.addMouseListener(buttonHoverEffect);
 
             // Action du bouton de chat
-            chatButton.addActionListener(e -> new ChatFrame(service, loggedInUsername).setVisible(true));
+            chatButton.addActionListener(e -> new ChatFrame(loggedInUsername).setVisible(true));
 
             profilePanel.add(chatButton);
         } else {
@@ -176,10 +177,10 @@ public class MainFrame extends JFrame {
         UIManager.put("TabbedPane.selected", new Color(79, 129, 189));
         UIManager.put("TabbedPane.contentAreaColor", new Color(236, 242, 255));
         
-        tabbedPane.addTab("Animaux", new AnimalPanel(service));
-        tabbedPane.addTab("Vaccins", new VaccinationPanel(service));
-        tabbedPane.addTab("Visites", new VisitPanel(service));
-        tabbedPane.addTab("Propriétaires", new OwnerPanel(service));
+        tabbedPane.addTab("Animaux", new AnimalPanel());
+        tabbedPane.addTab("Vaccins", new VaccinationPanel());
+        tabbedPane.addTab("Visites", new VisitPanel());
+        tabbedPane.addTab("Propriétaires", new OwnerPanel());
 
         add(tabbedPane, BorderLayout.CENTER);
     }

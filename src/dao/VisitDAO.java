@@ -1,13 +1,7 @@
 package dao;
 
 import model.Visit;
-import util.DatabaseConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface VisitDAO {
@@ -18,4 +12,5 @@ public interface VisitDAO {
     public void updateVisit(Visit visit) throws Exception;
 
     public void deleteVisit(int id) throws Exception;
+
 }
