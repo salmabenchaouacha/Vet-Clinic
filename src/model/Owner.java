@@ -3,6 +3,7 @@ package model;
 import java.io.Serializable;
 
 public class Owner implements Serializable {
+
     private int id;
     private String fullName;
 
@@ -54,17 +55,7 @@ public class Owner implements Serializable {
                 ", email='" + email + '\'' +
                 '}';
     }
-    public String getFirstName() {
-        if (fullName == null || fullName.isEmpty()) return "";
-        String[] parts = fullName.split(" ", 2);
-        return parts[0];
-    }
 
-    public String getLastName() {
-        if (fullName == null || fullName.isEmpty()) return "";
-        String[] parts = fullName.split(" ", 2);
-        return parts.length > 1 ? parts[1] : "";
-    }
 
     public void setEmail(String email) {
         this.email = email;
@@ -77,4 +68,6 @@ public class Owner implements Serializable {
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
+
+
 }

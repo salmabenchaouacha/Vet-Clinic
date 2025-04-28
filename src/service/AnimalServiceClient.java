@@ -20,6 +20,7 @@ public class AnimalServiceClient {
     }
 
     public boolean addAnimal(Animal animal) {
+
         try {
             animalService.addAnimal(animal);
             System.out.println("Animal added successfully.");

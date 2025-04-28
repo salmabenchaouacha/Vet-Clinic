@@ -5,7 +5,9 @@ import service.AnimalServiceClient;
 import service.OwnerServiceClient;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -17,36 +19,155 @@ public class OwnerPanel extends JPanel {
     private AnimalServiceClient animalService;
     private JTable ownerTable;
     private DefaultTableModel tableModel;
+    private JScrollPane scrollPane;
 
     public OwnerPanel() {
         this.service = new OwnerServiceClient();
         this.animalService = new AnimalServiceClient();
         setLayout(new BorderLayout());
-        setBackground(new Color(245, 245, 220)); // Fond beige clair pour le panneau principal
+        setBackground(new Color(224, 242, 254)); // Bleu pâle pastel (#E0F2FE) to match AnimalPanel
 
         // Tableau des propriétaires
         String[] columns = {"ID", "Nom", "Téléphone", "Email"};
         tableModel = new DefaultTableModel(columns, 0);
-        ownerTable = new JTable(tableModel);
-        ownerTable.setRowHeight(25);
+        ownerTable = new JTable(tableModel) {
+            @Override
+            public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                if (isRowSelected(row)) {
+                    c.setBackground(new Color(198, 222, 241)); // Ligne sélectionnée : bleu lavande
+                    c.setForeground(Color.BLACK);
+                } else {
+                    c.setBackground(new Color(255, 255, 255)); // Toutes les lignes en blanc
+                    c.setForeground(new Color(100, 116, 139)); // Gris bleuté pour le texte
+                }
+                return c;
+            }
+        };
+
+        // Style du tableau (to match AnimalPanel)
+        ownerTable.setRowHeight(50); // Augmenter la hauteur (same as AnimalPanel)
         ownerTable.setFont(new Font("Arial", Font.PLAIN, 12));
+        ownerTable.setShowGrid(true);
+        ownerTable.setGridColor(new Color(224, 242, 254)); // Grille en bleu pâle
         ownerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane scrollPane = new JScrollPane(ownerTable);
+
+        // Centrer certaines colonnes
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        ownerTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer); // ID
+
+        // Permettre au tableau de s'étirer sur toute la largeur de la fenêtre
+        ownerTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS); // Les colonnes s'ajustent pour remplir l'espace
+
+        // Style de l'en-tête
+        JTableHeader header = ownerTable.getTableHeader();
+        header.setBackground(new Color(242, 248, 226)); // Vert menthe pastel (#FAEDCB)
+        header.setForeground(Color.BLACK);
+        header.setFont(new Font("Arial", Font.BOLD, 12));
+        header.setBorder(BorderFactory.createLineBorder(new Color(250, 237, 203), 1));
+
+        // Effet de survol sur les lignes
+        ownerTable.addMouseMotionListener(new MouseAdapter() {
+            private int lastRow = -1;
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int row = ownerTable.rowAtPoint(e.getPoint());
+                if (row != lastRow) {
+                    if (lastRow != -1 && !ownerTable.isRowSelected(lastRow)) {
+                        ownerTable.repaint(ownerTable.getCellRect(lastRow, 0, true));
+                    }
+                    if (row != -1 && !ownerTable.isRowSelected(row)) {
+                        lastRow = row;
+                        ownerTable.repaint(ownerTable.getCellRect(row, 0, true));
+                    } else {
+                        lastRow = -1;
+                    }
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (lastRow != -1 && !ownerTable.isRowSelected(lastRow)) {
+                    ownerTable.repaint(ownerTable.getCellRect(lastRow, 0, true));
+                    lastRow = -1;
+                }
+            }
+        });
+
+        ownerTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int hoveredRow = -1;
+                Point p = table.getMousePosition();
+                if (p != null) {
+                    hoveredRow = table.rowAtPoint(p);
+                }
+                if (isSelected) {
+                    c.setBackground(new Color(198, 222, 241)); // Ligne sélectionnée : bleu lavande
+                    c.setForeground(Color.BLACK);
+                } else if (row == hoveredRow) {
+                    c.setBackground(new Color(224, 242, 254)); // Bleu pâle pour le survol (#E0F2FE)
+                    c.setForeground(new Color(100, 116, 139));
+                } else {
+                    c.setBackground(new Color(255, 255, 255)); // Toutes les lignes en blanc
+                    c.setForeground(new Color(100, 116, 139));
+                }
+                return c;
+            }
+        });
+
+        // Ajouter la JTable dans un JScrollPane pour avoir un scroll
+        scrollPane = new JScrollPane(ownerTable);
+        scrollPane.setBackground(new Color(224, 242, 254)); // Fond du JScrollPane
+        scrollPane.getViewport().setBackground(new Color(224, 242, 254)); // Fond du viewport (bleu pâle pour correspondre au fond)
         add(scrollPane, BorderLayout.CENTER);
 
-        // Boutons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.setBackground(new Color(245, 245, 220));
+        // Boutons (centered to match AnimalPanel)
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(new Color(243, 248, 255)); // Match AnimalPanel subpanel background
         JButton addButton = new JButton("Ajouter");
         JButton updateButton = new JButton("Modifier");
         JButton deleteButton = new JButton("Supprimer");
-        styleButton(addButton);
-        styleButton(updateButton);
-        styleButton(deleteButton);
+
+        // Appliquer des couleurs distinctes à chaque bouton (to match AnimalPanel)
+        styleButton(addButton, new Color(185, 201, 128), new Color(209, 250, 229)); // Vert menthe et survol
+        styleButton(updateButton, new Color(184, 180, 227), new Color(199, 210, 254)); // Bleu lavande et survol
+        styleButton(deleteButton, new Color(241, 199, 199), new Color(249, 168, 212)); // Rose poudré et survol
+
         buttonPanel.add(addButton);
         buttonPanel.add(updateButton);
         buttonPanel.add(deleteButton);
-        add(buttonPanel, BorderLayout.SOUTH);
+
+        // Load the image (to match AnimalPanel, but smaller)
+        ImageIcon catImageIcon;
+        try {
+            catImageIcon = new ImageIcon("emoji/ppp-removebg-preview.png");
+            // Resize the image to a smaller width
+            Image scaledImage = catImageIcon.getImage().getScaledInstance(300, -1, Image.SCALE_SMOOTH); // Adjust width to 300px, height proportional
+            catImageIcon = new ImageIcon(scaledImage);
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement de l'image : " + e.getMessage());
+            catImageIcon = new ImageIcon(); // Fallback to an empty icon
+        }
+        JLabel catImageLabel = new JLabel(catImageIcon);
+
+        // Create a panel to hold the image and center it
+        JPanel imagePanel = new JPanel();
+        imagePanel.setBackground(new Color(243, 248, 255)); // Match AnimalPanel subpanel background
+        imagePanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Center the image
+        imagePanel.add(catImageLabel);
+
+        // Create a main south panel to hold both the image panel and the button panel
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.setBackground(new Color(243, 248, 255)); // Match AnimalPanel subpanel background
+        southPanel.add(imagePanel, BorderLayout.NORTH); // Image at the top
+        southPanel.add(buttonPanel, BorderLayout.CENTER); // Buttons below the image
+
+        // Add the south panel to the main layout
+        add(southPanel, BorderLayout.SOUTH);
 
         // Charger les données
         refreshTable();
@@ -89,7 +210,7 @@ public class OwnerPanel extends JPanel {
             }
         });
 
-        // Menu contextuel pour clic droit
+        // Menu contextuel pour clic droit (retained from original OwnerPanel)
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem viewProfileItem = new JMenuItem("Voir profil");
         viewProfileItem.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -152,19 +273,22 @@ public class OwnerPanel extends JPanel {
         formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         formPanel.setBackground(new Color(224, 242, 254));
 
-        JTextField nameField = new JTextField(owner != null ? owner.getFullName() : "");
+        JTextField FirstNameField = new JTextField(owner != null ? owner.getFullName() : "");
+
         JTextField phoneField = new JTextField(owner != null ? owner.getPhone() : "");
         JTextField emailField = new JTextField(owner != null ? owner.getEmail() : "");
 
-        formPanel.add(new JLabel("Nom complet :"));
-        formPanel.add(nameField);
+        formPanel.add(new JLabel("Nom complet:"));
+        formPanel.add( FirstNameField);
+
         formPanel.add(new JLabel("Téléphone :"));
         formPanel.add(phoneField);
         formPanel.add(new JLabel("Email :"));
         formPanel.add(emailField);
 
         JButton saveButton = new JButton("Enregistrer");
-        styleButton(saveButton);
+
+        styleButton(saveButton, new Color(251, 207, 232), new Color(249, 168, 212)); // Rose poudré et survol
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(new Color(224, 242, 254));
         buttonPanel.add(saveButton);
@@ -172,14 +296,16 @@ public class OwnerPanel extends JPanel {
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
         saveButton.addActionListener(e -> {
-            if (nameField.getText().trim().isEmpty()) {
+
+            if (FirstNameField.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(dialog, "Le nom est obligatoire", "Erreur", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             try {
                 Owner newOwner = new Owner(
                         owner != null ? owner.getId() : 0,
-                        nameField.getText().trim(),
+                        FirstNameField.getText().trim(),
+
                         phoneField.getText().trim(),
                         emailField.getText().trim()
                 );
@@ -345,24 +471,11 @@ public class OwnerPanel extends JPanel {
 
         // Bouton fermer
         JButton closeButton = new JButton("Fermer");
-        styleButton(closeButton);
+        styleButton(closeButton, new Color(251, 207, 232), new Color(249, 168, 212)); // Match button style
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(new Color(224, 242, 254));
         buttonPanel.add(closeButton);
         closeButton.addActionListener(e -> profileDialog.dispose());
-
-        // Effet de survol pour le bouton
-        closeButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                closeButton.setBackground(new Color(249, 168, 212)); // Rose vif pastel (#F9A8D4)
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                closeButton.setBackground(new Color(251, 207, 232)); // Rose poudré (#FBCFE8)
-            }
-        });
 
         profileDialog.add(mainPanel, BorderLayout.CENTER);
         profileDialog.add(buttonPanel, BorderLayout.SOUTH);
@@ -451,16 +564,45 @@ public class OwnerPanel extends JPanel {
                         owner.getEmail() != null ? owner.getEmail() : "-"
                 });
             }
+
+            // Ajuster dynamiquement la hauteur du tableau en fonction du nombre de lignes
+            int rowCount = tableModel.getRowCount();
+            int rowHeight = ownerTable.getRowHeight();
+            int headerHeight = ownerTable.getTableHeader().getPreferredSize().height;
+            int totalHeight = (rowCount * rowHeight) + headerHeight;
+
+            // Définir la taille préférée du tableau
+            ownerTable.setPreferredScrollableViewportSize(new Dimension(
+                    ownerTable.getPreferredScrollableViewportSize().width, // Largeur inchangée
+                    totalHeight // Hauteur ajustée
+            ));
+
+            // Revalider le JScrollPane pour refléter la nouvelle taille
+            scrollPane.revalidate();
+            scrollPane.repaint();
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erreur lors du chargement des propriétaires : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void styleButton(JButton button) {
-        button.setBackground(new Color(251, 207, 232)); // Rose poudré (#FBCFE8)
-        button.setForeground(Color.WHITE);
+    private void styleButton(JButton button, Color baseColor, Color hoverColor) {
+        button.setBackground(baseColor);
+        button.setForeground(Color.BLACK);
         button.setFont(new Font("Arial", Font.BOLD, 12));
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(hoverColor);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(baseColor);
+            }
+        });
     }
 }

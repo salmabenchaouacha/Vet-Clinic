@@ -28,12 +28,12 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(236, 242, 255)); // Fond bleu très clair
+        getContentPane().setBackground(new Color(243, 248, 255)); // Fond bleu très clair
 
         // Récupérer les informations du vétérinaire connecté
         Veterinarian vet = null;
         try {
-            vet = client.findVeterinarianByUsername(loggedInUsername);
+            vet = client.findVeterinarianByEmail(loggedInUsername);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erreur lors de la récupération du profil : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
@@ -41,7 +41,7 @@ public class MainFrame extends JFrame {
         // Créer un panneau pour le profil en haut à droite
         JPanel profilePanel = new JPanel();
         profilePanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        profilePanel.setBackground(new Color(79, 129, 189)); // Bleu professionnel
+        profilePanel.setBackground(new Color(243, 248, 255)); // Bleu professionnel
         profilePanel.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 25));
 
         if (vet != null) {
@@ -71,39 +71,34 @@ public class MainFrame extends JFrame {
                     transform.translate(x / scale, y / scale);
                     g2d.setTransform(transform);
 
-                    // Dessiner l'image dans un cercle avec une bordure blanche
-                    g2d.setClip(new Ellipse2D.Float(0, 0, size, size));
-                    g2d.setColor(Color.WHITE);
-                    g2d.fillOval(0, 0, size, size);
-                    g2d.drawImage(originalImage, 0, 0, null);
-                    g2d.dispose();
 
-                    photoLabel.setIcon(new ImageIcon(resizedImage));
+
+
                 } else {
                     photoLabel.setText("Pas de photo");
-                    photoLabel.setForeground(Color.WHITE);
+                    photoLabel.setForeground(Color.black);
                 }
             } catch (IOException e) {
                 photoLabel.setText("Erreur photo");
-                photoLabel.setForeground(Color.WHITE);
+                photoLabel.setForeground(Color.black);
             }
 
             // Ajouter le nom à côté de la photo
             JLabel nameLabel = new JLabel("Dr. " + vet.getFullName());
             nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-            nameLabel.setForeground(Color.WHITE);
+            nameLabel.setForeground(Color.black);
 
             // Ajouter un effet de survol
             MouseAdapter hoverEffect = new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    nameLabel.setForeground(new Color(255, 255, 200));
+                    nameLabel.setForeground(new Color(132, 192, 255));
                     setCursor(new Cursor(Cursor.HAND_CURSOR));
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    nameLabel.setForeground(Color.WHITE);
+                    nameLabel.setForeground(Color.black);
                     setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
             };
@@ -128,7 +123,7 @@ public class MainFrame extends JFrame {
             JButton chatButton = new JButton("💬");
             chatButton.setFont(new Font("Segoe UI", Font.PLAIN, 18));
             chatButton.setForeground(Color.WHITE);
-            chatButton.setBackground(new Color(79, 129, 189));
+            chatButton.setBackground(new Color(243, 248, 255));
             chatButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
             chatButton.setFocusPainted(false);
             chatButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -138,12 +133,12 @@ public class MainFrame extends JFrame {
             MouseAdapter buttonHoverEffect = new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    chatButton.setBackground(new Color(59, 89, 152));
+                    chatButton.setBackground(new Color(243, 248, 255));
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    chatButton.setBackground(new Color(79, 129, 189));
+                    chatButton.setBackground(new Color(243, 248, 255));
                 }
             };
 
@@ -162,26 +157,46 @@ public class MainFrame extends JFrame {
 
         // Ajouter le panneau de profil en haut à droite
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(new Color(79, 129, 189)); // Même bleu que le profilePanel
-        topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(59, 89, 152))); // Bordure plus foncée
+        topPanel.setBackground(new Color(243, 248, 255)); // Même bleu que le profilePanel
+        topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(243, 248, 255))); // Bordure plus foncée
         topPanel.add(profilePanel, BorderLayout.EAST);
         add(topPanel, BorderLayout.NORTH);
 
         // Onglets pour les fonctionnalités principales
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        tabbedPane.setBackground(new Color(236, 242, 255));
-        tabbedPane.setForeground(new Color(44, 62, 80));
-        
-        // Style personnalisé pour les onglets
-        UIManager.put("TabbedPane.selected", new Color(79, 129, 189));
-        UIManager.put("TabbedPane.contentAreaColor", new Color(236, 242, 255));
-        
+        tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 14)); // Augmenter la taille de la police des onglets
+        tabbedPane.setBackground(new Color(236, 242, 255)); // Fond clair
+        tabbedPane.setForeground(new Color(44, 62, 80)); // Texte sombre pour contraster avec le fond
+
+// Style personnalisé pour les onglets
+        UIManager.put("TabbedPane.selected", new Color(79, 129, 189)); // Couleur de l'onglet sélectionné
+        UIManager.put("TabbedPane.contentAreaColor", new Color(236, 242, 255)); // Couleur de l'arrière-plan des panneaux d'onglets
+        UIManager.put("TabbedPane.tabAreaBackground", new Color(236, 242, 255)); // Fond de la zone des onglets
+
+// Augmenter la hauteur des onglets
+        UIManager.put("TabbedPane.tabHeight", 50); // Hauteur des onglets
+        UIManager.put("TabbedPane.tabInsets", new Insets(10, 20, 10, 20)); // Marge des onglets pour augmenter la taille des zones de texte
+
+// Appliquer une bordure plus marquée sur l'onglet sélectionné pour un effet plus net
+        UIManager.put("TabbedPane.borderColor", new Color(79, 129, 189));
+
+// Ajouter des effets de survol (hover)
+        tabbedPane.addChangeListener(e -> {
+            int selectedIndex = tabbedPane.getSelectedIndex();
+            if (selectedIndex != -1) {
+                tabbedPane.setBackgroundAt(selectedIndex, new Color(132, 192, 255)); // Couleur de fond au survol
+            }
+        });
+
+// Ajouter les onglets
+        tabbedPane.addTab("Propriétaires", new OwnerPanel());
         tabbedPane.addTab("Animaux", new AnimalPanel());
         tabbedPane.addTab("Vaccins", new VaccinationPanel());
         tabbedPane.addTab("Visites", new VisitPanel());
-        tabbedPane.addTab("Propriétaires", new OwnerPanel());
 
+
+// Ajouter le tabbedPane au centre
         add(tabbedPane, BorderLayout.CENTER);
+
     }
 }

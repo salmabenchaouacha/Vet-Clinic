@@ -12,7 +12,7 @@ public class ChatMessageServiceClient {
 
     public ChatMessageServiceClient() {
         try {
-            chatMessageService = (ChatMessageRemote) Naming.lookup("rmi://localhost:1099/chatMessageService");
+            chatMessageService = (ChatMessageRemote) Naming.lookup("rmi://localhost:1099/chatService");
             System.out.println("Connected to ChatMessageService");
         } catch (Exception e) {
             System.err.println("Error connecting to ChatMessageRemote: " + e.getMessage());

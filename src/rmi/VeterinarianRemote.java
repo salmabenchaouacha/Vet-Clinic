@@ -11,9 +11,11 @@ public interface VeterinarianRemote extends Remote {
 
     void update(Veterinarian veterinarian) throws RemoteException, Exception;
 
-    Veterinarian findByUsername(String username) throws RemoteException, Exception;
+    Veterinarian findByEmail(String username) throws RemoteException, Exception;
 
     List<Veterinarian> findAll() throws RemoteException, Exception;
 
     boolean authenticate(String username, String password) throws RemoteException, Exception;
+
+
 }

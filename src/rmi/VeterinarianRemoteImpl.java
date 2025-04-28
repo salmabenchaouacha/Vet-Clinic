@@ -27,8 +27,8 @@ public class VeterinarianRemoteImpl extends UnicastRemoteObject implements Veter
     }
 
     @Override
-    public Veterinarian findByUsername(String username) throws Exception {
-        return veterinarianDAO.findByUsername(username);
+    public Veterinarian findByEmail(String email) throws Exception {
+        return veterinarianDAO.findByEmail(email);
     }
 
     @Override

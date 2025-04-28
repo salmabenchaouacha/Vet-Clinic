@@ -47,17 +47,24 @@ public class VeterinarianServiceClient {
         }
     }
 
-    public Veterinarian findVeterinarianByUsername(String username) {
+    public Veterinarian findVeterinarianByEmail(String email) {
         try {
-            return veterinarianService.findByUsername(username);
+            Veterinarian vet = veterinarianService.findByEmail(email);
+            if (vet == null) {
+                System.out.println("Aucun vétérinaire trouvé pour email : " + email);
+            } else {
+                System.out.println("Vétérinaire trouvé : " + vet.getFullName());
+            }
+            return vet;
         } catch (RemoteException e) {
-            System.err.println("RemoteException during findVeterinarianByUsername: " + e.getMessage());
+            System.err.println("Erreur de communication RMI : " + e.getMessage());
             return null;
         } catch (Exception e) {
-            System.err.println("Exception during findVeterinarianByUsername: " + e.getMessage());
+            System.err.println("Erreur inattendue : " + e.getMessage());
             return null;
         }
     }
+
 
     public List<Veterinarian> findAllVeterinarians() {
         try {
@@ -71,9 +78,9 @@ public class VeterinarianServiceClient {
         }
     }
 
-    public boolean authenticateVeterinarian(String username, String password) {
+    public boolean authenticateVeterinarian(String email, String password) {
         try {
-            return veterinarianService.authenticate(username, password);
+            return veterinarianService.authenticate(email, password);
         } catch (RemoteException e) {
             System.err.println("RemoteException during authenticateVeterinarian: " + e.getMessage());
             return false;

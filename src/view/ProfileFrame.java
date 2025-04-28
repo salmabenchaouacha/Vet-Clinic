@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.rmi.RemoteException;
 import javax.imageio.ImageIO;
 
 public class ProfileFrame extends JFrame {
@@ -29,7 +28,7 @@ public class ProfileFrame extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(240, 248, 255));
 
-        // Panel pour la photo
+        // Photo panel
         JPanel photoPanel = new JPanel();
         photoPanel.setBackground(new Color(240, 248, 255));
         JLabel photoLabel = new JLabel();
@@ -53,7 +52,7 @@ public class ProfileFrame extends JFrame {
         photoPanel.add(photoLabel);
         add(photoPanel, BorderLayout.NORTH);
 
-        // Panel pour les détails modifiables
+        // Form panel
         JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         formPanel.setBackground(new Color(240, 248, 255));
@@ -64,7 +63,7 @@ public class ProfileFrame extends JFrame {
         emailField = new JTextField(veterinarian.getEmail());
         JLabel phoneLabel = new JLabel("Téléphone :");
         phoneField = new JTextField(veterinarian.getPhone() != null ? veterinarian.getPhone() : "");
-        JLabel photoPathLabel = new JLabel("Photo :"); // Renommé pour éviter le conflit
+        JLabel photoPathLabel = new JLabel("Photo :");
         photoPathField = new JTextField(veterinarian.getPhotoPath() != null ? veterinarian.getPhotoPath() : "");
         JButton browseButton = new JButton("Parcourir");
 
@@ -82,7 +81,7 @@ public class ProfileFrame extends JFrame {
 
         add(formPanel, BorderLayout.CENTER);
 
-        // Panel pour les boutons
+        // Button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(new Color(240, 248, 255));
         JButton saveButton = new JButton("Enregistrer");
@@ -93,7 +92,7 @@ public class ProfileFrame extends JFrame {
         buttonPanel.add(logoutButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Action du bouton Parcourir
+        // Browse button action
         browseButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             int result = fileChooser.showOpenDialog(this);
@@ -103,7 +102,7 @@ public class ProfileFrame extends JFrame {
             }
         });
 
-        // Action du bouton Enregistrer
+        // Save button action
         saveButton.addActionListener(e -> {
             try {
                 veterinarian.setFullName(fullNameField.getText().trim());
@@ -111,7 +110,6 @@ public class ProfileFrame extends JFrame {
                 veterinarian.setPhone(phoneField.getText().trim());
                 veterinarian.setPhotoPath(photoPathField.getText().trim());
 
-                // Mettre à jour via la méthode RMI
                 service.updateVeterinarian(veterinarian);
 
                 JOptionPane.showMessageDialog(this, "Profil mis à jour avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
@@ -123,11 +121,16 @@ public class ProfileFrame extends JFrame {
             }
         });
 
-        // Action du bouton Déconnexion
+        // Logout button action
         logoutButton.addActionListener(e -> {
             dispose();
             mainFrame.dispose();
-            new SignInFrame().setVisible(true);
+            try {
+                VeterinarianServiceClient serviceClient = new VeterinarianServiceClient();
+                new SignInFrame(serviceClient).setVisible(true);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
     }
 

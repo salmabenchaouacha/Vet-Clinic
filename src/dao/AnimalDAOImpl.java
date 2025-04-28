@@ -97,8 +97,8 @@ public class AnimalDAOImpl implements AnimalDAO{
                         rs.getString("age"),
                         rs.getString("sex"),
                         rs.getString("chip_number"),
-                        rs.getInt("owner_id"),
-                        rs.getString("photoPath")
+                        rs.getInt("ownerId"),
+                        rs.getString("photo_path")
                 );
                 animals.add(animal);
             }

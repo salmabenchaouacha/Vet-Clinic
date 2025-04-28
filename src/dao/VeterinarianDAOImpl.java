@@ -42,29 +42,31 @@ public class VeterinarianDAOImpl implements VeterinarianDAO {
     }
 
     @Override
-    public Veterinarian findByUsername(String username) throws Exception {
-        String query = "SELECT * FROM veterinarians WHERE username = ?";
+    public Veterinarian findByEmail(String email) throws Exception {
+        List<Veterinarian> vets = new ArrayList<>();
+        String query = "SELECT * FROM veterinarians  WHERE email = ?";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new Veterinarian(
-                            rs.getInt("id"),
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("full_name"),
-                            rs.getString("email"),
-                            rs.getString("phone"),
-                            rs.getString("photo_path")
-                    );
-                }
-                throw new Exception("Vétérinaire non trouvé avec le nom d'utilisateur : " + username);
+             PreparedStatement stmt = conn.prepareStatement(query);) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Veterinarian vet = new Veterinarian(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("full_name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("photo_path")
+                );
+                vets.add(vet);
             }
+           return vets.get(0);
         } catch (SQLException e) {
-            throw new Exception("Erreur lors de la récupération du vétérinaire", e);
+            throw new Exception("Erreur lors de la récupération des vétérinaires", e);
         }
     }
+
 
     @Override
     public List<Veterinarian> findAll() throws Exception {
@@ -92,11 +94,11 @@ public class VeterinarianDAOImpl implements VeterinarianDAO {
     }
 
     @Override
-    public boolean authenticate(String username, String password) throws Exception {
-        String query = "SELECT * FROM veterinarians WHERE username = ? AND password = ?";
+    public boolean authenticate(String email, String password) throws Exception {
+        String query = "SELECT * FROM veterinarians WHERE email= ? AND password = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
+            stmt.setString(1, email);
             stmt.setString(2, password);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
