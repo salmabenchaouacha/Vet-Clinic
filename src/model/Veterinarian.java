@@ -10,8 +10,17 @@ public class Veterinarian implements Serializable {
     private String password;
     private String fullName;
     private String email;
+
+    public Veterinarian() {
+    }
+
     private String phone;
     private String photoPath;
+
+    @Override
+    public String toString() {
+        return username;
+    }
 
     public Veterinarian(int id, String username, String password, String fullName, String email, String phone) {
         this.id = id;

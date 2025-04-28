@@ -21,9 +21,13 @@ public class ChatFrame extends JFrame {
     private JTextField messageField;
     private Timer refreshTimer;
     private JComboBox<String> veterinarianCombo;
+    String user;
+
+
 
     public ChatFrame(String currentUsername) {
         this.veterinarianService = new VeterinarianServiceClient();
+        this.user = String.valueOf(veterinarianService.findVeterinarianByEmail(currentUsername));
         this.chatService = new ChatMessageServiceClient();
         this.currentUsername = currentUsername;
 
@@ -113,8 +117,12 @@ public class ChatFrame extends JFrame {
                 return;
             }
 
+
             for (Veterinarian vet : vets) {
-                if (!vet.getUsername().equals(currentUsername)) {
+
+                System.out.println("******************** " + vet.getUsername());
+                System.out.println("***currentUsername**"+ user);
+                if (!vet.getUsername().equals(user)) {
                     veterinarianCombo.addItem(vet.getUsername());
                     System.out.println("Ajout du vétérinaire à la liste : " + vet.getUsername());
                 }else {
@@ -140,9 +148,10 @@ public class ChatFrame extends JFrame {
 
     private void sendMessage() {
         String message = messageField.getText().trim();
+
         if (!message.isEmpty() && selectedVetUsername != null) {
             try {
-                chatService.sendChatMessage(currentUsername, selectedVetUsername, message);
+                chatService.sendChatMessage(user, selectedVetUsername, message);
                 messageField.setText("");
                 refreshChat();
             } catch (Exception e) {
@@ -154,8 +163,13 @@ public class ChatFrame extends JFrame {
     private void refreshChat() {
         this.chatService = new ChatMessageServiceClient();
         if (selectedVetUsername != null) {
+            System.out.println("SELECTED "+selectedVetUsername);
             try {
-                List<ChatMessage> messages = chatService.getMessagesBetweenUsers(currentUsername, selectedVetUsername);
+                List<ChatMessage> messages = chatService.getMessagesBetweenUsers(user, selectedVetUsername);
+
+                for (ChatMessage message : messages) {
+                    System.out.println("From: " + message.getSenderUsername() + ", To: " + message.getReceiverUsername() + ", Content: " + message.getContent());
+                }
                 updateChatArea(messages);
             } catch (Exception e) {
                 System.err.println("Erreur lors du rafraîchissement du chat : " + e.getMessage());

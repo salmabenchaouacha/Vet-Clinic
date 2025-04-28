@@ -59,8 +59,8 @@ public class SignInFrame extends JFrame {
         }
     }
 
-    public SignInFrame(  VeterinarianServiceClient service) {
-        this.service = service;
+    public SignInFrame(  ) {
+        this.service = new VeterinarianServiceClient();
         setTitle("Connexion - Clinique Vétérinaire 🐾");
         setSize(420, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -168,7 +168,7 @@ public class SignInFrame extends JFrame {
         });
 
         // Action bouton inscription
-        signUpButton.addActionListener(e -> new SignUpFrame(service).setVisible(true));
+        signUpButton.addActionListener(e -> new SignUpFrame().setVisible(true));
     }
 
     private void styleTextField(JTextField field) {

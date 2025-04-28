@@ -65,8 +65,8 @@ public class SignUpFrame extends JFrame {
         }
     }
 
-    public SignUpFrame(VeterinarianServiceClient service) {
-        this.service = service;
+    public SignUpFrame() {
+        this.service = new VeterinarianServiceClient();
         setTitle("Inscription Vétérinaire 🐾");
         setSize(420, 450); // Frame width remains 420px
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

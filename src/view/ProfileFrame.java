@@ -18,9 +18,9 @@ public class ProfileFrame extends JFrame {
     private JTextField phoneField;
     private JTextField photoPathField;
 
-    public ProfileFrame(Veterinarian veterinarian, MainFrame mainFrame) {
+    public ProfileFrame( MainFrame mainFrame) {
         this.service = new VeterinarianServiceClient();
-        this.veterinarian = veterinarian;
+        this.veterinarian = new Veterinarian();
         setTitle("Profil du Vétérinaire");
         setSize(400, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -126,8 +126,7 @@ public class ProfileFrame extends JFrame {
             dispose();
             mainFrame.dispose();
             try {
-                VeterinarianServiceClient serviceClient = new VeterinarianServiceClient();
-                new SignInFrame(serviceClient).setVisible(true);
+                new SignInFrame().setVisible(true);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

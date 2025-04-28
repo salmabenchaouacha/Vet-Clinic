@@ -108,7 +108,7 @@ public class MainFrame extends JFrame {
             MouseAdapter openProfileListener = new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    new ProfileFrame(finalVet, MainFrame.this).setVisible(true);
+                    new ProfileFrame( MainFrame.this).setVisible(true);
                 }
             };
             photoLabel.addMouseListener(openProfileListener);
